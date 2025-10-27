@@ -354,6 +354,7 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
                   (context) => ProcesoDetalleScreen(
                     proceso: proceso,
                     producto: productoSeleccionado!,
+                    api: widget.api,
                   ),
             ),
           );

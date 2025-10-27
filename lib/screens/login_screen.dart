@@ -23,22 +23,22 @@ class _LoginScreenState extends State<LoginScreen>
 
   // 🔐 Usuarios y contraseñas predefinidos
   final Map<String, Map<String, dynamic>> _validUsers = {
-    'admin': {
+    'ADMIN': {
       'password': '123456',
       'role': 'Administrador',
       'name': 'Administrador del Sistema',
     },
-    'operador': {
+    'OPERADOR': {
       'password': 'produccion2024',
       'role': 'Operador',
       'name': 'Operador de Producción',
     },
-    'supervisor': {
+    'SUPERVISOR': {
       'password': 'alimentos123',
       'role': 'Supervisor',
       'name': 'Supervisor de Calidad',
     },
-    'carlos.marquez': {
+    'CARLOS.MARQUEZ': {
       'password': 'carlos123',
       'role': 'Gerente',
       'name': 'Carlos Márquez',
@@ -272,6 +272,8 @@ class _LoginScreenState extends State<LoginScreen>
                               // Campo de usuario
                               TextFormField(
                                 controller: _usernameController,
+                                textCapitalization:
+                                    TextCapitalization.characters,
                                 decoration: InputDecoration(
                                   labelText: 'Usuario',
                                   prefixIcon: const Icon(Icons.person_outline),
@@ -301,6 +303,8 @@ class _LoginScreenState extends State<LoginScreen>
                               TextFormField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
+                                textCapitalization:
+                                    TextCapitalization.characters,
                                 decoration: InputDecoration(
                                   labelText: 'Contraseña',
                                   prefixIcon: const Icon(Icons.lock_outline),

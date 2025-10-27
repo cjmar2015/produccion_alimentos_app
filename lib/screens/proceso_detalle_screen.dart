@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/proceso_model.dart';
 import '../services/api_service.dart';
+import '../widgets/proveedor_dropdown.dart';
 import 'login_screen.dart';
 
 /// Pantalla de detalle para ingresar/ver datos específicos de un proceso
 class ProcesoDetalleScreen extends StatefulWidget {
   final ProcesoProduccion proceso;
   final Map<String, dynamic> producto;
+  final ApiService api;
 
   const ProcesoDetalleScreen({
     super.key,
     required this.proceso,
     required this.producto,
+    required this.api,
   });
 
   @override
@@ -252,6 +255,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
             // Campo de número
             TextFormField(
               controller: _controladores[campo.nombre],
+              textCapitalization: TextCapitalization.characters,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -319,6 +323,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
       case 'temperatura':
         return TextFormField(
           controller: _controladores[campo.nombre],
+          textCapitalization: TextCapitalization.characters,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
             hintText: 'Ingrese ${campo.nombre.toLowerCase()}',
@@ -347,6 +352,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
         return TextFormField(
           controller: _controladores[campo.nombre],
           readOnly: true,
+          textCapitalization: TextCapitalization.characters,
           decoration: InputDecoration(
             hintText: 'Seleccione fecha',
             prefixIcon: const Icon(Icons.calendar_today),
@@ -400,8 +406,25 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
         );
 
       default: // texto
+        // Verificar si es un campo de proveedor
+        if (campo.nombre.toLowerCase().contains('proveedor')) {
+          return ProveedorDropdown(
+            api: widget.api,
+            valorInicial: null, // Dejar null por ahora para evitar conflictos
+            requerido: campo.requerido,
+            labelText: campo.nombre,
+            onChanged: (valor) {
+              if (valor != null) {
+                _controladores[campo.nombre]?.text = valor;
+              }
+            },
+          );
+        }
+
+        // Campo de texto normal
         return TextFormField(
           controller: _controladores[campo.nombre],
+          textCapitalization: TextCapitalization.characters,
           maxLines: campo.nombre.toLowerCase().contains('observacion') ? 3 : 1,
           decoration: InputDecoration(
             hintText: 'Ingrese ${campo.nombre.toLowerCase()}',
@@ -559,7 +582,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
           'usuario_actual'; // Aquí deberías obtener el usuario logueado
 
       // Llamar a la API para guardar los datos
-      await ApiService('http://168.90.15.177:5050').guardarProcesoProduccion(
+      await widget.api.guardarProcesoProduccion(
         idProducto: widget.producto['id_producto'],
         tipoProces: widget.proceso.id,
         operario: operarioActual,

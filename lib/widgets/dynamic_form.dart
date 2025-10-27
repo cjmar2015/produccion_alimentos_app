@@ -19,44 +19,49 @@ class _DynamicFormState extends State<DynamicForm> {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
-        child: Column(children: [
-          ...widget.paso.fields.map((f) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: '${f.name}${f.unit != null ? ' (${f.unit})' : ''}',
-                  border: OutlineInputBorder(
+        child: Column(
+          children: [
+            ...widget.paso.fields.map((f) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: TextFormField(
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(
+                    labelText:
+                        '${f.name}${f.unit != null ? ' (${f.unit})' : ''}',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onSaved: (v) => _values[f.name] = double.tryParse(v ?? '0'),
+                  validator:
+                      (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
+                ),
+              );
+            }),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.save),
+                label: const Text('Guardar'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                keyboardType: TextInputType.number,
-                onSaved: (v) => _values[f.name] = double.tryParse(v ?? '0'),
-                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    widget.onSubmit(_values);
+                  }
+                },
               ),
-            );
-          }),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.save),
-              label: const Text('Guardar'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  widget.onSubmit(_values);
-                }
-              },
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
