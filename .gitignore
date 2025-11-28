@@ -33,6 +33,11 @@ migrate_working_dir/
 .pub/
 /build/
 
+# iOS build artifacts
+ios/build/
+ios/*.ipa
+ios/ExportOptions.plist
+
 # Symbolication related
 app.*.symbols
 
