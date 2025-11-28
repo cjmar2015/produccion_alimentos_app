@@ -397,7 +397,7 @@ class _ControlAlmacenamientoScreenState
             padding: const EdgeInsets.only(bottom: 16),
             child: _buildCondicionCard(entry.key, entry.value),
           );
-        }).toList(),
+        }),
       ],
     );
   }

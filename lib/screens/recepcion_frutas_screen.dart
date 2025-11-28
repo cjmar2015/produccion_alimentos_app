@@ -119,7 +119,7 @@ class _RecepcionFrutasScreenState extends State<RecepcionFrutasScreen> {
         _proveedores = proveedores;
       });
     } catch (e) {
-      print('Error cargando proveedores: $e');
+      // Error cargando proveedores
     }
   }
 
@@ -397,7 +397,7 @@ class _RecepcionFrutasScreenState extends State<RecepcionFrutasScreen> {
               },
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -433,7 +433,7 @@ class _RecepcionFrutasScreenState extends State<RecepcionFrutasScreen> {
               },
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

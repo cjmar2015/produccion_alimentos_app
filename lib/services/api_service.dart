@@ -22,9 +22,6 @@ class ApiService {
 
       // Si hay error de autenticación, usar datos de ejemplo directamente
       if (r.statusCode == 401) {
-        print(
-          '🔒 Error de autenticación 401, usando productos de ejemplo locales',
-        );
         return _getProductosEjemplo();
       }
 
@@ -36,10 +33,6 @@ class ApiService {
       if (responseData is Map &&
           responseData['id_producto'] == null &&
           responseData['nombre'] == null) {
-        print(
-          '⚠️ Tabla producto vacía, intentando insertar productos de ejemplo...',
-        );
-
         // Intentar insertar productos de ejemplo
         await _insertarProductosEjemplo();
 
@@ -57,7 +50,6 @@ class ApiService {
         }
 
         // Si aún no hay datos, usar fallback local
-        print('📦 Usando productos de ejemplo locales');
         return _getProductosEjemplo();
       }
 
@@ -69,9 +61,7 @@ class ApiService {
       // Si es un objeto válido, convertirlo en lista
       return [responseData];
     } catch (e) {
-      print('❌ Error conectando con API: $e');
-      // En caso de error, devolver datos de ejemplo
-      print('📦 Usando productos de ejemplo locales por error de conexión');
+      // En caso de error de red, usar datos de ejemplo
       return _getProductosEjemplo();
     }
   }
@@ -92,11 +82,11 @@ class ApiService {
             }),
           );
         } catch (e) {
-          print('⚠️ Error insertando producto ${producto['nombre']}: $e');
+          // Error insertando producto, continuar con los siguientes
         }
       }
     } catch (e) {
-      print('❌ Error al intentar insertar productos: $e');
+      // Error al intentar insertar productos
     }
   }
 
@@ -361,10 +351,7 @@ class ApiService {
       'creado_por': creadoPor ?? 'APP_USER',
     };
 
-    print('🚀 Enviando datos a /api/materia-prima:');
-    print('   URL: $baseUrl/api/materia-prima');
-    print('   Headers: $_headers');
-    print('   Body: ${jsonEncode(requestBody)}');
+    // Enviando datos a /api/materia-prima
 
     try {
       final r = await http.post(
@@ -373,9 +360,7 @@ class ApiService {
         body: jsonEncode(requestBody),
       );
 
-      print('📡 Respuesta del servidor:');
-      print('   Status: ${r.statusCode}');
-      print('   Body: ${r.body}');
+      // Respuesta del servidor
 
       if (r.statusCode != 200 && r.statusCode != 201) {
         String errorMessage = 'Error al crear materia prima: ${r.statusCode}';

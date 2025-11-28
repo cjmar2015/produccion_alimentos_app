@@ -651,9 +651,6 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
 
   /// Guardar específicamente datos de Materia Prima
   Future<void> _guardarMateriaPrima(Map<String, dynamic> datos) async {
-    print('🔍 Datos recibidos en _guardarMateriaPrima: $datos');
-    print('🔍 Producto seleccionado: ${widget.producto}');
-
     // Validar que el producto esté disponible
     if (widget.producto == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -689,15 +686,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
     ); // Siempre fecha actual
     String observaciones = '1'; // Siempre enviar "1"
 
-    print('📊 Datos para API:');
-    print('  - productoId: $productoId (del producto seleccionado)');
-    print('  - productoNombre: ${widget.producto!['nombre']}');
-    print('  - ingrediente: $ingrediente');
-    print('  - cantidad: $cantidad');
-    print('  - unidad: $unidad');
-    print('  - fechaRecepcion: $fechaRecepcion (fecha actual)');
-    print('  - proveedor: $proveedor (valor fijo)');
-    print('  - observaciones: $observaciones (valor fijo)');
+    // Datos para API preparados
 
     // Validar datos requeridos
     if (ingrediente.isEmpty) {
@@ -740,7 +729,7 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
       }
     });
 
-    print('🧹 Campos limpiados para ingresar otro ingrediente');
+    // Campos limpiados para ingresar otro ingrediente
 
     // Enfocar el campo de ingrediente para facilitar el siguiente ingreso
     WidgetsBinding.instance.addPostFrameCallback((_) {
