@@ -18,65 +18,166 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   DateTime? _fechaInspeccion;
   final _horaController = TextEditingController();
   String? _responsable;
-  final _areaProduccionController = TextEditingController();
-  final _numeroLoteController = TextEditingController();
+  String? _productoSeleccionado;
 
   final List<String> _responsables = ['ROCIO', 'LORENA'];
-
-  // Paso 2 - Materias Primas Recibidas
-  final List<Map<String, dynamic>> _materiasPrimas = [
-    {
-      'nombre': 'Leche',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    {
-      'nombre': 'Yemas de huevo / Huevo fresco',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    {
-      'nombre': 'Azúcar',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    {
-      'nombre': 'Licor (aguardiente/ron)',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    {
-      'nombre': 'Esencias / saborizantes',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    {
-      'nombre': 'Otros ingredientes',
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
+  final List<String> _productos = [
+    'LECHE',
+    'FRUTA',
+    'AZUCAR',
+    'HUEVOS',
+    'CREMA DE LECHE',
+    'CANELA',
+    'ACIDO CITRICO',
+    'BICARBONATO',
+    'AGUARDIENTE',
+    'BENZOATO',
+    'CEBOLLA',
+    'GINEBRA',
+    'SORBATO',
+    'ONIX',
+    'COLORANTE',
   ];
 
-  // Paso 3 - Criterios de Inspección
-  final Map<String, Map<String, Map<String, dynamic>>> _criteriosInspeccion = {
+  // Paso 2 - Materias Primas Recibidas
+  // Mapeo de productos a sus materias primas específicas
+  final Map<String, List<String>> _productoMateriasPrimas = {
+    'LECHE': ['Leche'],
+    'FRUTA': ['Fruta'],
+    'AZUCAR': ['Azúcar'],
+    'HUEVOS': ['Huevos / yemas'],
+    'CREMA DE LECHE': ['Crema de leche'],
+    'CANELA': ['Canela'],
+    'ACIDO CITRICO': ['Ácido cítrico'],
+    'BICARBONATO': ['Bicarbonato'],
+    'AGUARDIENTE': ['Aguardiente'],
+    'BENZOATO': ['Benzoato'],
+    'CEBOLLA': ['Cebolla'],
+    'GINEBRA': ['Ginebra'],
+    'SORBATO': ['Sorbato'],
+    'ONIX': ['Onix'],
+    'COLORANTE': ['Colorante'],
+  };
+
+  final Map<String, Map<String, dynamic>> _todasMateriasPrimas = {
+    'Leche': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Fruta': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Azúcar': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Huevos / yemas': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Crema de leche': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Canela': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Ácido cítrico': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Bicarbonato': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Aguardiente': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Benzoato': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Cebolla': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Ginebra': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Sorbato': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Onix': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+    'Colorante': {
+      'proveedor': TextEditingController(),
+      'cantidad': TextEditingController(),
+      'condicionEmpaque': null,
+      'aprobada': null,
+    },
+  };
+
+  List<Map<String, dynamic>> get _materiasPrimas {
+    if (_productoSeleccionado == null) return [];
+
+    final materiasPrimasProducto =
+        _productoMateriasPrimas[_productoSeleccionado] ?? [];
+    return materiasPrimasProducto.map((nombre) {
+      return {'nombre': nombre, ..._todasMateriasPrimas[nombre]!};
+    }).toList();
+  }
+
+  // Paso 3 - Criterios de Inspección por materia prima
+  final Map<String, Map<String, Map<String, dynamic>>>
+  _todosCriteriosInspeccion = {
     'Leche': {
       'Olor fresco, sin fermentación': {'cumple': null, 'observaciones': ''},
       'Color blanco-crema uniforme': {'cumple': null, 'observaciones': ''},
       'No presenta grumos o separación': {'cumple': null, 'observaciones': ''},
       'Temp. a recepción adecuada': {'cumple': null, 'observaciones': ''},
       'Empaque íntegro, limpio': {'cumple': null, 'observaciones': ''},
+    },
+    'Fruta': {
+      'Color característico': {'cumple': null, 'observaciones': ''},
+      'Sin golpes o machucones': {'cumple': null, 'observaciones': ''},
+      'Ausencia de moho o fermentación': {'cumple': null, 'observaciones': ''},
+      'Grado de madurez adecuado': {'cumple': null, 'observaciones': ''},
+      'Limpia y sin insectos': {'cumple': null, 'observaciones': ''},
     },
     'Huevos / yemas': {
       'Sin olor desagradable': {'cumple': null, 'observaciones': ''},
@@ -90,28 +191,85 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
       'Sin humedad o apelmazamiento': {'cumple': null, 'observaciones': ''},
       'Empaque íntegro': {'cumple': null, 'observaciones': ''},
     },
-    'Licor': {
-      'Sello de seguridad intacto': {'cumple': null, 'observaciones': ''},
-      'Transparencia y ausencia de partículas': {
-        'cumple': null,
-        'observaciones': '',
-      },
-      'Concentración alcohólica declarada': {
-        'cumple': null,
-        'observaciones': '',
-      },
-      'Proveniente de proveedor aprobado': {
-        'cumple': null,
-        'observaciones': '',
-      },
+    'Crema de leche': {
+      'Olor fresco característico': {'cumple': null, 'observaciones': ''},
+      'Color uniforme': {'cumple': null, 'observaciones': ''},
+      'Textura cremosa sin separación': {'cumple': null, 'observaciones': ''},
+      'Temperatura adecuada': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
     },
-    'Esencias y otros': {
-      'Color y olor característicos': {'cumple': null, 'observaciones': ''},
-      'Envase sellado': {'cumple': null, 'observaciones': ''},
-      'Sin evidencia de contaminación': {'cumple': null, 'observaciones': ''},
-      'Cumple con registro sanitario': {'cumple': null, 'observaciones': ''},
+    'Canela': {
+      'Color característico': {'cumple': null, 'observaciones': ''},
+      'Aroma fuerte y agradable': {'cumple': null, 'observaciones': ''},
+      'Sin presencia de humedad': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
+    },
+    'Ácido cítrico': {
+      'Cristales blancos': {'cumple': null, 'observaciones': ''},
+      'Sin impurezas': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
+      'Registro sanitario vigente': {'cumple': null, 'observaciones': ''},
+    },
+    'Bicarbonato': {
+      'Polvo blanco fino': {'cumple': null, 'observaciones': ''},
+      'Sin grumos': {'cumple': null, 'observaciones': ''},
+      'Empaque íntegro': {'cumple': null, 'observaciones': ''},
+      'Fecha de vencimiento vigente': {'cumple': null, 'observaciones': ''},
+    },
+    'Aguardiente': {
+      'Sello de seguridad intacto': {'cumple': null, 'observaciones': ''},
+      'Transparencia sin partículas': {'cumple': null, 'observaciones': ''},
+      'Graduación alcohólica declarada': {'cumple': null, 'observaciones': ''},
+      'Proveedor autorizado': {'cumple': null, 'observaciones': ''},
+    },
+    'Benzoato': {
+      'Polvo cristalino blanco': {'cumple': null, 'observaciones': ''},
+      'Sin contaminación': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
+      'Ficha técnica disponible': {'cumple': null, 'observaciones': ''},
+    },
+    'Cebolla': {
+      'Firmeza adecuada': {'cumple': null, 'observaciones': ''},
+      'Sin brotes excesivos': {'cumple': null, 'observaciones': ''},
+      'Ausencia de podredumbre': {'cumple': null, 'observaciones': ''},
+      'Limpia y sin tierra': {'cumple': null, 'observaciones': ''},
+    },
+    'Ginebra': {
+      'Sello intacto': {'cumple': null, 'observaciones': ''},
+      'Transparencia característica': {'cumple': null, 'observaciones': ''},
+      'Graduación correcta': {'cumple': null, 'observaciones': ''},
+      'Proveedor autorizado': {'cumple': null, 'observaciones': ''},
+    },
+    'Sorbato': {
+      'Polvo cristalino': {'cumple': null, 'observaciones': ''},
+      'Color característico': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
+      'Certificado de análisis': {'cumple': null, 'observaciones': ''},
+    },
+    'Onix': {
+      'Apariencia característica': {'cumple': null, 'observaciones': ''},
+      'Sin contaminantes': {'cumple': null, 'observaciones': ''},
+      'Empaque íntegro': {'cumple': null, 'observaciones': ''},
+      'Documentación completa': {'cumple': null, 'observaciones': ''},
+    },
+    'Colorante': {
+      'Color uniforme': {'cumple': null, 'observaciones': ''},
+      'Solubilidad adecuada': {'cumple': null, 'observaciones': ''},
+      'Empaque sellado': {'cumple': null, 'observaciones': ''},
+      'Registro sanitario vigente': {'cumple': null, 'observaciones': ''},
     },
   };
+
+  Map<String, Map<String, Map<String, dynamic>>> get _criteriosInspeccion {
+    final criteriosFiltrados = <String, Map<String, Map<String, dynamic>>>{};
+    for (var mp in _materiasPrimas) {
+      final nombre = mp['nombre'];
+      if (_todosCriteriosInspeccion.containsKey(nombre)) {
+        criteriosFiltrados[nombre] = _todosCriteriosInspeccion[nombre]!;
+      }
+    }
+    return criteriosFiltrados;
+  }
 
   // Paso 4 - Condiciones de Transporte
   final Map<String, Map<String, dynamic>> _condicionesTransporte = {
@@ -140,9 +298,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   @override
   void dispose() {
     _horaController.dispose();
-    _areaProduccionController.dispose();
-    _numeroLoteController.dispose();
-    for (var mp in _materiasPrimas) {
+    for (var mp in _todasMateriasPrimas.values) {
       mp['proveedor'].dispose();
       mp['cantidad'].dispose();
     }
@@ -367,18 +523,17 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           },
         ),
         const SizedBox(height: 16),
-        _buildTextField(
-          controller: _areaProduccionController,
-          label: 'Área o Línea de Producción',
+        _buildDropdownField(
+          label: 'Producto',
+          value: _productoSeleccionado,
+          items: _productos,
           required: true,
-          icon: Icons.factory_outlined,
-        ),
-        const SizedBox(height: 16),
-        _buildTextField(
-          controller: _numeroLoteController,
-          label: 'Número del Lote de Producción',
-          required: true,
-          icon: Icons.qr_code_outlined,
+          icon: Icons.inventory_2_outlined,
+          onChanged: (value) {
+            setState(() {
+              _productoSeleccionado = value;
+            });
+          },
         ),
       ],
     );
@@ -444,13 +599,13 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
                     observaciones: criterio.value['observaciones'],
                     onCumpleChanged: (value) {
                       setState(() {
-                        _criteriosInspeccion[categoria.key]![criterio
+                        _todosCriteriosInspeccion[categoria.key]![criterio
                                 .key]!['cumple'] =
                             value;
                       });
                     },
                     onObservacionesChanged: (value) {
-                      _criteriosInspeccion[categoria.key]![criterio
+                      _todosCriteriosInspeccion[categoria.key]![criterio
                               .key]!['observaciones'] =
                           value;
                     },
@@ -1189,12 +1344,8 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           _showError('El responsable es obligatorio');
           return false;
         }
-        if (_areaProduccionController.text.isEmpty) {
-          _showError('El área de producción es obligatoria');
-          return false;
-        }
-        if (_numeroLoteController.text.isEmpty) {
-          _showError('El número de lote es obligatorio');
+        if (_productoSeleccionado == null || _productoSeleccionado!.isEmpty) {
+          _showError('Debe seleccionar un producto');
           return false;
         }
         return true;
