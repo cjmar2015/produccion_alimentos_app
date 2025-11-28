@@ -44,8 +44,8 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
 
   // Unidades según el producto
   final Map<String, List<String>> _productoUnidades = {
-    'LECHE': ['LITROS', 'GALONES'],
-    'FRUTA': ['KILOS', 'GRAMOS', 'UNIDADES'],
+    'LECHE': ['LITROS', 'BOTELLAS'],
+    'FRUTA': ['KILOS', 'GRAMOS', 'UNIDADES', 'LIBRAS'],
     'AZUCAR': ['KILOS', 'GRAMOS', 'LIBRAS'],
     'HUEVOS': ['UNIDADES', 'DOCENAS', 'BANDEJAS'],
     'CREMA DE LECHE': ['LITROS', 'MILILITROS'],
