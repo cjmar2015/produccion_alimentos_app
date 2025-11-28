@@ -19,6 +19,9 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   final _horaController = TextEditingController();
   String? _responsable;
   String? _productoSeleccionado;
+  final _cantidadController = TextEditingController();
+  String? _unidadSeleccionada;
+  final _valorCompraController = TextEditingController();
 
   final List<String> _responsables = ['ROCIO', 'LORENA'];
   final List<String> _productos = [
@@ -38,6 +41,30 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     'ONIX',
     'COLORANTE',
   ];
+
+  // Unidades según el producto
+  final Map<String, List<String>> _productoUnidades = {
+    'LECHE': ['LITROS', 'GALONES'],
+    'FRUTA': ['KILOS', 'GRAMOS', 'UNIDADES'],
+    'AZUCAR': ['KILOS', 'GRAMOS', 'LIBRAS'],
+    'HUEVOS': ['UNIDADES', 'DOCENAS', 'BANDEJAS'],
+    'CREMA DE LECHE': ['LITROS', 'MILILITROS'],
+    'CANELA': ['GRAMOS', 'KILOS', 'UNIDADES'],
+    'ACIDO CITRICO': ['GRAMOS', 'KILOS'],
+    'BICARBONATO': ['GRAMOS', 'KILOS'],
+    'AGUARDIENTE': ['LITROS', 'MILILITROS', 'BOTELLAS'],
+    'BENZOATO': ['GRAMOS', 'KILOS'],
+    'CEBOLLA': ['KILOS', 'GRAMOS', 'UNIDADES'],
+    'GINEBRA': ['LITROS', 'MILILITROS', 'BOTELLAS'],
+    'SORBATO': ['GRAMOS', 'KILOS'],
+    'ONIX': ['GRAMOS', 'KILOS', 'UNIDADES'],
+    'COLORANTE': ['GRAMOS', 'KILOS', 'MILILITROS'],
+  };
+
+  List<String> get _unidadesDisponibles {
+    if (_productoSeleccionado == null) return [];
+    return _productoUnidades[_productoSeleccionado] ?? [];
+  }
 
   // Paso 2 - Materias Primas Recibidas
   // Mapeo de productos a sus materias primas específicas
@@ -298,6 +325,8 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   @override
   void dispose() {
     _horaController.dispose();
+    _cantidadController.dispose();
+    _valorCompraController.dispose();
     for (var mp in _todasMateriasPrimas.values) {
       mp['proveedor'].dispose();
       mp['cantidad'].dispose();
@@ -532,9 +561,40 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           onChanged: (value) {
             setState(() {
               _productoSeleccionado = value;
+              _unidadSeleccionada = null;
+              _cantidadController.clear();
             });
           },
         ),
+        if (_productoSeleccionado != null) ...[
+          const SizedBox(height: 16),
+          _buildNumberField(
+            controller: _cantidadController,
+            label: 'Cantidad',
+            required: true,
+            icon: Icons.scale_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdownField(
+            label: 'Unidad',
+            value: _unidadSeleccionada,
+            items: _unidadesDisponibles,
+            required: true,
+            icon: Icons.straighten_outlined,
+            onChanged: (value) {
+              setState(() {
+                _unidadSeleccionada = value;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildNumberField(
+            controller: _valorCompraController,
+            label: 'Valor de Compra \$COP',
+            required: true,
+            icon: Icons.attach_money_outlined,
+          ),
+        ],
       ],
     );
   }
@@ -767,16 +827,15 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildNumberField({
     required TextEditingController controller,
     required String label,
     bool required = false,
-    TextInputType? keyboardType,
     IconData? icon,
   }) {
     return TextFormField(
       controller: controller,
-      keyboardType: keyboardType,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
         labelText: label + (required ? ' *' : ''),
         prefixIcon: icon != null ? Icon(icon) : null,
@@ -1346,6 +1405,18 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
         }
         if (_productoSeleccionado == null || _productoSeleccionado!.isEmpty) {
           _showError('Debe seleccionar un producto');
+          return false;
+        }
+        if (_cantidadController.text.isEmpty) {
+          _showError('La cantidad es obligatoria');
+          return false;
+        }
+        if (_unidadSeleccionada == null || _unidadSeleccionada!.isEmpty) {
+          _showError('Debe seleccionar una unidad');
+          return false;
+        }
+        if (_valorCompraController.text.isEmpty) {
+          _showError('El valor de compra es obligatorio');
           return false;
         }
         return true;
