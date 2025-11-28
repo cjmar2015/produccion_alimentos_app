@@ -7,13 +7,13 @@ import 'login_screen.dart';
 /// Pantalla de detalle para ingresar/ver datos específicos de un proceso
 class ProcesoDetalleScreen extends StatefulWidget {
   final ProcesoProduccion proceso;
-  final Map<String, dynamic> producto;
+  final Map<String, dynamic>? producto;
   final ApiService api;
 
   const ProcesoDetalleScreen({
     super.key,
     required this.proceso,
-    required this.producto,
+    this.producto,
     required this.api,
   });
 
@@ -27,6 +27,9 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
 
   // Controladores para los campos de texto
   final Map<String, TextEditingController> _controladores = {};
+
+  // FocusNode para el campo de ingrediente
+  final FocusNode _ingredienteFocusNode = FocusNode();
 
   // Estado de guardado
   bool _guardando = false;
@@ -46,6 +49,8 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
     for (var controlador in _controladores.values) {
       controlador.dispose();
     }
+    // Limpiar focus node
+    _ingredienteFocusNode.dispose();
     super.dispose();
   }
 
@@ -61,13 +66,14 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
               widget.proceso.nombre,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text(
-              widget.producto['nombre'],
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
+            if (widget.producto != null)
+              Text(
+                widget.producto!['nombre'],
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
           ],
         ),
         backgroundColor: const Color(0xFF600F40), // Azul Bancolombia
@@ -424,6 +430,8 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
         // Campo de texto normal
         return TextFormField(
           controller: _controladores[campo.nombre],
+          focusNode:
+              campo.nombre == 'Ingrediente' ? _ingredienteFocusNode : null,
           textCapitalization: TextCapitalization.characters,
           maxLines: campo.nombre.toLowerCase().contains('observacion') ? 3 : 1,
           decoration: InputDecoration(
@@ -577,40 +585,50 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
         }
       }
 
-      // Obtener información del usuario actual (puedes ajustar esto según tu sistema de login)
-      String operarioActual =
-          'usuario_actual'; // Aquí deberías obtener el usuario logueado
+      // Si es el proceso "Control de Materias Primas", usar endpoint específico
+      if (widget.proceso.id == '2' &&
+          widget.proceso.nombre == 'Control de Materias Primas') {
+        await _guardarMateriaPrima(datosFormulario);
 
-      // Llamar a la API para guardar los datos
-      await widget.api.guardarProcesoProduccion(
-        idProducto: widget.producto['id_producto'],
-        tipoProces: widget.proceso.id,
-        operario: operarioActual,
-        datos: datosFormulario,
-        lote:
-            'LOTE-${DateTime.now().millisecondsSinceEpoch}', // Generar lote automático
-        observaciones: 'Proceso: ${widget.proceso.nombre}',
-      );
-
-      // Actualizar valores en el modelo local
-      for (var campo in widget.proceso.campos) {
-        campo.valor = _controladores[campo.nombre]?.text ?? '';
-      }
-
-      if (mounted) {
-        // Mostrar mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '✅ ${widget.proceso.nombre} guardado en base de datos',
+        if (mounted) {
+          // Mostrar mensaje de éxito
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '✅ Ingrediente "${datosFormulario['Ingrediente']}" guardado correctamente',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
             ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+          );
 
-        // Volver a la pantalla anterior
-        Navigator.pop(context);
+          // Limpiar los campos para permitir ingreso de otro ingrediente
+          _limpiarCamposMateriaPrima();
+        }
+      } else {
+        // Para otros procesos, usar el método general
+        await _guardarProcesoGeneral(datosFormulario);
+
+        // Actualizar valores en el modelo local
+        for (var campo in widget.proceso.campos) {
+          campo.valor = _controladores[campo.nombre]?.text ?? '';
+        }
+
+        if (mounted) {
+          // Mostrar mensaje de éxito
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '✅ ${widget.proceso.nombre} guardado en base de datos',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+
+          // Volver a la pantalla anterior
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -629,6 +647,125 @@ class _ProcesoDetalleScreenState extends State<ProcesoDetalleScreen> {
         });
       }
     }
+  }
+
+  /// Guardar específicamente datos de Materia Prima
+  Future<void> _guardarMateriaPrima(Map<String, dynamic> datos) async {
+    print('🔍 Datos recibidos en _guardarMateriaPrima: $datos');
+    print('🔍 Producto seleccionado: ${widget.producto}');
+
+    // Validar que el producto esté disponible
+    if (widget.producto == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: No hay producto seleccionado'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Usar el ID del producto seleccionado en la pantalla anterior
+    int productoId = widget.producto!['id_producto'] ?? 1;
+    String ingrediente = datos['Ingrediente'] ?? '';
+
+    // Manejar cantidad con unidad
+    double cantidad = 0.0;
+    String unidad = 'LIBRAS';
+
+    if (datos['Cantidad Recibida'] is Map) {
+      cantidad =
+          double.tryParse(datos['Cantidad Recibida']['valor'] ?? '0') ?? 0.0;
+      unidad = datos['Cantidad Recibida']['unidad'] ?? 'LIBRAS';
+    } else {
+      cantidad = double.tryParse(datos['Cantidad Recibida'] ?? '0') ?? 0.0;
+    }
+
+    // Valores fijos como solicitado
+    String proveedor = '1'; // Siempre enviar "1"
+    String fechaRecepcion = DateTime.now().toIso8601String().substring(
+      0,
+      10,
+    ); // Siempre fecha actual
+    String observaciones = '1'; // Siempre enviar "1"
+
+    print('📊 Datos para API:');
+    print('  - productoId: $productoId (del producto seleccionado)');
+    print('  - productoNombre: ${widget.producto!['nombre']}');
+    print('  - ingrediente: $ingrediente');
+    print('  - cantidad: $cantidad');
+    print('  - unidad: $unidad');
+    print('  - fechaRecepcion: $fechaRecepcion (fecha actual)');
+    print('  - proveedor: $proveedor (valor fijo)');
+    print('  - observaciones: $observaciones (valor fijo)');
+
+    // Validar datos requeridos
+    if (ingrediente.isEmpty) {
+      throw Exception('El ingrediente es requerido');
+    }
+    if (cantidad <= 0) {
+      throw Exception('La cantidad debe ser mayor a 0');
+    }
+
+    // Llamar al endpoint específico de materia prima
+    await widget.api.crearMateriaPrima(
+      productoId: productoId,
+      ingrediente: ingrediente,
+      cantidad: cantidad,
+      unidad: unidad,
+      fechaRecepcion: fechaRecepcion,
+      proveedor: proveedor,
+      observaciones: observaciones,
+      creadoPor: 'APP_USER',
+    );
+  }
+
+  /// Limpiar los campos del formulario de Materia Prima para permitir ingreso de otro ingrediente
+  void _limpiarCamposMateriaPrima() {
+    setState(() {
+      // Limpiar solo los controladores de texto
+      for (var campo in widget.proceso.campos) {
+        if (_controladores[campo.nombre] != null) {
+          if (campo.nombre == 'Ingrediente') {
+            // Limpiar el campo ingrediente
+            _controladores[campo.nombre]!.clear();
+            campo.valor = '';
+          } else if (campo.nombre == 'Cantidad Recibida') {
+            // Limpiar el campo cantidad pero mantener la unidad seleccionada
+            _controladores[campo.nombre]!.clear();
+            campo.valor = '';
+            // La unidad se mantiene en campo.unidadSeleccionada
+          }
+        }
+      }
+    });
+
+    print('🧹 Campos limpiados para ingresar otro ingrediente');
+
+    // Enfocar el campo de ingrediente para facilitar el siguiente ingreso
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _ingredienteFocusNode.requestFocus();
+      }
+    });
+  }
+
+  /// Guardar proceso usando el método general
+  Future<void> _guardarProcesoGeneral(
+    Map<String, dynamic> datosFormulario,
+  ) async {
+    // Obtener información del usuario actual
+    String operarioActual = 'usuario_actual';
+
+    // Llamar a la API para guardar los datos usando el método general
+    await widget.api.guardarProcesoProduccion(
+      idProducto: widget.producto?['id_producto'] ?? 0,
+      tipoProces: widget.proceso.id,
+      operario: operarioActual,
+      datos: datosFormulario,
+      lote: 'LOTE-${DateTime.now().millisecondsSinceEpoch}',
+      observaciones: 'Proceso: ${widget.proceso.nombre}',
+    );
   }
 
   /// Diálogo de confirmación para cerrar sesión

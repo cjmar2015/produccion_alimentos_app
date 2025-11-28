@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildModernCard(
                         context,
                         'Control de Procesos',
-                        'Gestiona procesos de conservas y dulces',
+                        '',
                         Icons.inventory_2_outlined,
                         const Color(0xFF667EEA),
                         const Color(0xFF764BA2),
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildModernCard(
                         context,
                         'Gestión de Pasos',
-                        'Administra pasos de producción por producto',
+                        '',
                         Icons.auto_awesome_mosaic_outlined,
                         const Color(0xFF764BA2),
                         const Color(0xFFF093FB),
@@ -112,18 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF8F9FA)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF667EEA).withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -136,21 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(
-                    96,
-                    15,
-                    64,
-                    1,
-                  ), // Mismo color que el fondo del logo
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF000000).withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                  border: Border.all(color: const Color(0xFFE9ECEF), width: 1),
+                  color: const Color(0xFF600F40),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!, width: 1),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -161,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Icon(
-                          Icons.restaurant_menu,
+                          Icons.restaurant_menu_outlined,
                           color: Colors.white,
                           size: 18,
                         );
@@ -205,25 +183,14 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFF8F9FA), Color(0xFFE9ECEF)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFDEE2E6), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF000000).withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!, width: 1),
               ),
               child: const Icon(
-                Icons.person_outline_rounded,
-                color: Color(0xFF495057),
-                size: 18,
+                Icons.person_outlined,
+                color: Color(0xFF600F40),
+                size: 20,
               ),
             ),
           ),
@@ -232,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Card moderno con gradientes elegantes
+  // Card moderno con flat design
   Widget _buildModernCard(
     BuildContext context,
     String title,
@@ -244,37 +211,20 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [primaryColor, secondaryColor],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 28),
-                ),
+                Icon(icon, color: const Color(0xFF600F40), size: 32),
                 const SizedBox(width: 20),
                 Expanded(
                   child: Column(
@@ -285,26 +235,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: GoogleFonts.montserrat(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: const Color(0xFF212121),
                           letterSpacing: 0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        description,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          height: 1.4,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white.withValues(alpha: 0.7),
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.grey[400],
                   size: 16,
                 ),
               ],

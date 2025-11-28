@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import '../models/proceso_model.dart';
 import '../services/api_service.dart';
 import 'proceso_detalle_screen.dart';
+import 'recepcion_frutas_screen.dart';
+import 'control_materias_screen.dart';
+import 'control_coccion_screen.dart';
+import 'control_parametros_screen.dart';
+import 'control_almacenamiento_screen.dart';
+import 'movimientos_inventario_screen.dart';
 import 'login_screen.dart';
 
 /// Pantalla principal para el control de procesos de producción
@@ -15,48 +21,14 @@ class ControlProcesosScreen extends StatefulWidget {
 }
 
 class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
-  // Lista de productos obtenidos de la API
-  List<dynamic> productos = [];
-
-  // Producto seleccionado actualmente
-  Map<String, dynamic>? productoSeleccionado;
-
   // Lista de procesos predefinidos
   late List<ProcesoProduccion> procesos;
-
-  // Estado de carga
-  bool isLoading = true;
-  String? error;
 
   @override
   void initState() {
     super.initState();
     // Inicializar los procesos predefinidos
     procesos = DatosProcesos.obtenerProcesos();
-    // Cargar productos desde la API
-    _cargarProductos();
-  }
-
-  /// Carga la lista de productos desde la API
-  Future<void> _cargarProductos() async {
-    try {
-      setState(() {
-        isLoading = true;
-        error = null;
-      });
-
-      final productosData = await widget.api.getProductos();
-
-      setState(() {
-        productos = productosData;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = 'Error al cargar productos: $e';
-        isLoading = false;
-      });
-    }
   }
 
   @override
@@ -66,21 +38,31 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
       appBar: AppBar(
         title: const Text(
           'Control de Procesos',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        backgroundColor: const Color(0xFF600F40), // 🎨 PÚRPURA DE TIRO
-        foregroundColor: Colors.white,
-        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF212121),
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey[300], height: 1),
+        ),
         actions: [
-          // Botón de actualizar productos
+          // Botón de actualizar formularios
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _cargarProductos,
-            tooltip: 'Actualizar productos',
+            icon: const Icon(Icons.refresh_outlined),
+            onPressed: () {
+              // Forzar recarga del widget completo
+              setState(() {
+                procesos = DatosProcesos.obtenerProcesos();
+              });
+            },
+            tooltip: 'Actualizar formularios',
           ),
           // Menú de usuario con opción de cerrar sesión
           PopupMenuButton<String>(
-            icon: const Icon(Icons.account_circle),
+            icon: const Icon(Icons.account_circle_outlined),
             onSelected: (String value) {
               if (value == 'logout') {
                 _showLogoutDialog(context);
@@ -92,7 +74,7 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
                     value: 'logout',
                     child: Row(
                       children: [
-                        Icon(Icons.logout, color: Colors.red),
+                        Icon(Icons.logout_outlined, color: Colors.red),
                         SizedBox(width: 8),
                         Text('Cerrar Sesión'),
                       ],
@@ -104,52 +86,36 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
       ),
 
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.grey[50]!, Colors.white],
-          ),
-        ),
+        color: const Color(0xFFF5F5F5),
         child: CustomScrollView(
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.all(12.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Sección de selección de producto
-                  _buildSeccionSeleccionProducto(),
-
-                  const SizedBox(height: 16),
-
-                  // Título de procesos
-                  if (productoSeleccionado != null) ...[
-                    _buildTituloProcesos(),
-                    const SizedBox(height: 12),
-                  ],
+                  // Título de formularios de control
+                  _buildTituloProcesos(),
+                  const SizedBox(height: 12),
                 ]),
               ),
             ),
 
             // Lista de procesos como SliverGrid
-            if (productoSeleccionado != null)
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 1.0,
-                  ),
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final proceso = procesos[index];
-                    return _buildTarjetaProceso(proceso);
-                  }, childCount: procesos.length),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 1.0,
                 ),
-              )
-            else
-              SliverFillRemaining(child: _buildMensajeSeleccionarProducto()),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final proceso = procesos[index];
+                  return _buildTarjetaProceso(proceso);
+                }, childCount: procesos.length),
+              ),
+            ),
           ],
         ),
       ),
@@ -157,146 +123,6 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
   }
 
   /// Widget para la sección de selección de producto
-  Widget _buildSeccionSeleccionProducto() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Título de la sección
-          const Row(
-            children: [
-              Icon(
-                Icons.inventory_2,
-                color: Color(0xFF600F40),
-                size: 24,
-              ), // 🎨 PÚRPURA DE TIRO
-              SizedBox(width: 8),
-              Text(
-                'Seleccionar Producto',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF5D4037),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Dropdown de productos o mensaje de carga/error
-          if (isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(),
-              ),
-            )
-          else if (error != null)
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.error, color: Colors.red[600]),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      error!,
-                      style: TextStyle(color: Colors.red[700]),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            // Dropdown con lista de productos
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  value: productoSeleccionado?['id_producto'],
-                  hint: const Text(
-                    'Selecciona un producto...',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  isExpanded: true,
-                  items:
-                      productos.map((producto) {
-                        return DropdownMenuItem<int>(
-                          value: producto['id_producto'],
-                          child: Text(
-                            producto['nombre'] ?? 'Producto sin nombre',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        );
-                      }).toList(),
-                  onChanged: (int? productoId) {
-                    setState(() {
-                      productoSeleccionado = productos.firstWhere(
-                        (producto) => producto['id_producto'] == productoId,
-                      );
-                    });
-                  },
-                ),
-              ),
-            ),
-
-          // Información del producto seleccionado
-          if (productoSeleccionado != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF8D6E63).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info,
-                    color: Color(0xFF600F40), // 🎨 PÚRPURA DE TIRO
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      productoSeleccionado!['descripcion'] ?? 'Sin descripción',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF5D4037),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   /// Título de la sección de procesos
   Widget _buildTituloProcesos() {
     return Row(
@@ -319,25 +145,6 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
     );
   }
 
-  /// Lista de procesos en formato de tarjetas
-  Widget _buildListaProcesos() {
-    return GridView.builder(
-      shrinkWrap: true, // Se ajusta al contenido
-      physics: const NeverScrollableScrollPhysics(), // No scrollea internamente
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 columnas en el grid
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.0, // Proporción más cuadrada
-      ),
-      itemCount: procesos.length,
-      itemBuilder: (context, index) {
-        final proceso = procesos[index];
-        return _buildTarjetaProceso(proceso);
-      },
-    );
-  }
-
   /// Tarjeta individual para cada proceso
   Widget _buildTarjetaProceso(ProcesoProduccion proceso) {
     return Card(
@@ -346,62 +153,117 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () {
-          // Navegar a la pantalla de detalle del proceso
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => ProcesoDetalleScreen(
-                    proceso: proceso,
-                    producto: productoSeleccionado!,
-                    api: widget.api,
-                  ),
-            ),
-          );
+          // Si es el formulario de Recepción de Frutas, usar pantalla especial con wizard
+          if (proceso.id == '1') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RecepcionFrutasScreen(api: widget.api),
+              ),
+            );
+          }
+          // Si es el formulario de Control de Materias Primas, usar pantalla especial con wizard
+          else if (proceso.id == '2') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ControlMateriasScreen(api: widget.api),
+              ),
+            );
+          }
+          // Si es el formulario de Control de Cocción, usar pantalla especial con wizard
+          else if (proceso.id == '3') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ControlCoccionScreen(api: widget.api),
+              ),
+            );
+          }
+          // Si es el formulario de Control de Parámetros Críticos, usar pantalla especial con wizard
+          else if (proceso.id == '4') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ControlParametrosScreen(api: widget.api),
+              ),
+            );
+          }
+          // Si es el formulario de Control de Almacenamiento, usar pantalla especial con wizard
+          else if (proceso.id == '5') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => ControlAlmacenamientoScreen(api: widget.api),
+              ),
+            );
+          }
+          // Si es el formulario de Movimientos de Inventario
+          else if (proceso.id == '6') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => MovimientosInventarioScreen(api: widget.api),
+              ),
+            );
+          } else {
+            // Para otros formularios, navegar directamente sin producto
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        ProcesoDetalleScreen(proceso: proceso, api: widget.api),
+              ),
+            );
+          }
         },
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                const Color(
-                  0xFF600F40, // 🎨 PÚRPURA DE TIRO
-                ).withValues(alpha: 0.08),
-              ],
-            ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[300]!, width: 1),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icono del proceso
-              Text(proceso.icono, style: const TextStyle(fontSize: 28)),
+              // Icono del proceso (Material Design minimalista)
+              Icon(
+                _getIconData(proceso.icono),
+                size: 36,
+                color: const Color(0xFF600F40), // 🎨 PÚRPURA DE TIRO
+              ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // Nombre del proceso
               Text(
                 proceso.nombre,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF5D4037),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF212121),
+                  letterSpacing: 0.2,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
 
               // Descripción breve
               Text(
                 proceso.descripcion,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Color(0xFF757575),
+                  fontWeight: FontWeight.w400,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -412,25 +274,125 @@ class _ControlProcesosScreenState extends State<ControlProcesosScreen> {
     );
   }
 
-  /// Mensaje cuando no se ha seleccionado producto
-  Widget _buildMensajeSeleccionarProducto() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.arrow_upward, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'Selecciona un producto arriba\npara ver los procesos disponibles',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
+  /// Convertir nombre de icono a IconData
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'inventory_2_outlined':
+        return Icons.inventory_2_outlined;
+      case 'eco_outlined':
+        return Icons.eco_outlined;
+      case 'whatshot_outlined':
+        return Icons.whatshot_outlined;
+      case 'warning_amber_outlined':
+        return Icons.warning_amber_outlined;
+      case 'local_bar_outlined':
+        return Icons.local_bar_outlined;
+      case 'warehouse_outlined':
+        return Icons.warehouse_outlined;
+      default:
+        return Icons.circle_outlined;
+    }
+  }
+
+  /// Mostrar diálogo para seleccionar producto antes de navegar al formulario
+  Future<void> _mostrarSelectorProductoYNavegar(
+    ProcesoProduccion proceso,
+  ) async {
+    Map<String, dynamic>? productoSeleccionado;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text('Seleccionar Producto'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Este formulario requiere seleccionar un producto primero:',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 16),
+                    FutureBuilder<List<dynamic>>(
+                      future: widget.api.getProductos(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+
+                        final productos = snapshot.data ?? [];
+
+                        if (productos.isEmpty) {
+                          return const Text('No hay productos disponibles');
+                        }
+
+                        return DropdownButtonFormField<Map<String, dynamic>>(
+                          value: productoSeleccionado,
+                          decoration: const InputDecoration(
+                            labelText: 'Producto',
+                            border: OutlineInputBorder(),
+                          ),
+                          items:
+                              productos.map((producto) {
+                                final prod = producto as Map<String, dynamic>;
+                                return DropdownMenuItem<Map<String, dynamic>>(
+                                  value: prod,
+                                  child: Text(prod['nombre'] ?? 'Sin nombre'),
+                                );
+                              }).toList(),
+                          onChanged: (value) {
+                            setStateDialog(() {
+                              productoSeleccionado = value;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed:
+                      productoSeleccionado != null
+                          ? () {
+                            Navigator.pop(context);
+                            // Navegar al formulario con el producto seleccionado
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ProcesoDetalleScreen(
+                                      proceso: proceso,
+                                      producto: productoSeleccionado,
+                                      api: widget.api,
+                                    ),
+                              ),
+                            );
+                          }
+                          : null,
+                  child: const Text('Continuar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

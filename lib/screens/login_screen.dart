@@ -153,18 +153,9 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF600F40), // 🎨 PÚRPURA DE TIRO
-              Color(0xFF87556B), // 💜 HEXO BÍBLIA
-              Color(0xFFB07992), // 🌸 VIOLETA CLARO
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -179,30 +170,19 @@ class _LoginScreenState extends State<LoginScreen>
                       // Logo y título
                       Container(
                         padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/logo.png', // 🖼️ TU IMAGEN PERSONALIZADA
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Si la imagen no se encuentra, muestra el ícono por defecto
-                              return const Icon(
-                                Icons.restaurant_menu,
-                                size: 80,
-                                color: Colors.white,
-                              );
-                            },
-                          ),
+                        child: Image.asset(
+                          'assets/images/logo.png', // 🖼️ TU IMAGEN PERSONALIZADA
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Si la imagen no se encuentra, muestra el ícono por defecto
+                            return const Icon(
+                              Icons.restaurant_menu_outlined,
+                              size: 80,
+                              color: Color(0xFF600F40),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 30),
@@ -210,22 +190,20 @@ class _LoginScreenState extends State<LoginScreen>
                       Text(
                         'HECHO A MANO',
                         style: GoogleFonts.montserrat(
-                          fontSize: 18, // Aumentado de 18 a 24
-                          fontWeight: FontWeight.w500, // Medium weight
-                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF757575),
                           letterSpacing: 1.2,
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ), // Reducido drásticamente para que sea muy visible
+                      const SizedBox(height: 5),
 
                       Text(
                         'AURORA',
                         style: GoogleFonts.playfairDisplay(
-                          fontSize: 62, // Aumentado de 28 a 32
+                          fontSize: 62,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: const Color(0xFF600F40),
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -233,9 +211,9 @@ class _LoginScreenState extends State<LoginScreen>
                       Text(
                         'TIBASOSA, BOYACÁ',
                         style: GoogleFonts.montserrat(
-                          fontSize: 18, // Reducido de 18 a 14
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontWeight: FontWeight.w300, // Light weight
+                          fontSize: 18,
+                          color: const Color(0xFF757575),
+                          fontWeight: FontWeight.w300,
                           letterSpacing: 1.0,
                         ),
                       ),
@@ -246,14 +224,11 @@ class _LoginScreenState extends State<LoginScreen>
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
                         ),
                         child: Form(
                           key: _formKey,
@@ -263,8 +238,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 'Iniciar Sesión',
                                 style: TextStyle(
                                   fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF003366),
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF212121),
                                 ),
                               ),
                               const SizedBox(height: 30),
@@ -276,17 +251,15 @@ class _LoginScreenState extends State<LoginScreen>
                                     TextCapitalization.characters,
                                 decoration: InputDecoration(
                                   labelText: 'Usuario',
-                                  prefixIcon: const Icon(Icons.person_outline),
+                                  prefixIcon: const Icon(Icons.person_outlined),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
-                                      color: Color(
-                                        0xFF600F40,
-                                      ), // 🎨 PÚRPURA DE TIRO
-                                      width: 2,
+                                      color: Color(0xFF600F40),
+                                      width: 1.5,
                                     ),
                                   ),
                                 ),
@@ -307,12 +280,12 @@ class _LoginScreenState extends State<LoginScreen>
                                     TextCapitalization.characters,
                                 decoration: InputDecoration(
                                   labelText: 'Contraseña',
-                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  prefixIcon: const Icon(Icons.lock_outlined),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -321,15 +294,13 @@ class _LoginScreenState extends State<LoginScreen>
                                     },
                                   ),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                                    borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
-                                      color: Color(
-                                        0xFF600F40,
-                                      ), // 🎨 PÚRPURA DE TIRO
-                                      width: 2,
+                                      color: Color(0xFF600F40),
+                                      width: 1.5,
                                     ),
                                   ),
                                 ),
@@ -349,14 +320,12 @@ class _LoginScreenState extends State<LoginScreen>
                                 child: ElevatedButton(
                                   onPressed: _isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(
-                                      0xFF600F40,
-                                    ), // 🎨 PÚRPURA DE TIRO
+                                    backgroundColor: const Color(0xFF600F40),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    elevation: 3,
+                                    elevation: 0,
                                   ),
                                   child:
                                       _isLoading

@@ -338,4 +338,83 @@ class ApiService {
       throw Exception('Error al buscar proveedores: ${r.statusCode}');
     return jsonDecode(r.body);
   }
+
+  /// Crear un nuevo registro de materia prima
+  Future<Map<String, dynamic>> crearMateriaPrima({
+    required int productoId,
+    required String ingrediente,
+    required double cantidad,
+    required String unidad,
+    required String fechaRecepcion,
+    String? proveedor,
+    String? observaciones,
+    String? creadoPor,
+  }) async {
+    final Map<String, dynamic> requestBody = {
+      'producto_id': productoId.toString(), // Convertir a string por si acaso
+      'ingrediente': ingrediente,
+      'cantidad': cantidad.toString(), // Convertir a string por si acaso
+      'unidad': unidad,
+      'fecha_recepcion': fechaRecepcion,
+      'proveedor': proveedor ?? '',
+      'observaciones': observaciones ?? '',
+      'creado_por': creadoPor ?? 'APP_USER',
+    };
+
+    print('🚀 Enviando datos a /api/materia-prima:');
+    print('   URL: $baseUrl/api/materia-prima');
+    print('   Headers: $_headers');
+    print('   Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final r = await http.post(
+        Uri.parse('$baseUrl/api/materia-prima'),
+        headers: _headers,
+        body: jsonEncode(requestBody),
+      );
+
+      print('📡 Respuesta del servidor:');
+      print('   Status: ${r.statusCode}');
+      print('   Body: ${r.body}');
+
+      if (r.statusCode != 200 && r.statusCode != 201) {
+        String errorMessage = 'Error al crear materia prima: ${r.statusCode}';
+
+        try {
+          final errorData = jsonDecode(r.body);
+          if (errorData is Map && errorData.containsKey('error')) {
+            errorMessage += ' - ${errorData['error']}';
+          } else if (errorData is Map && errorData.containsKey('message')) {
+            errorMessage += ' - ${errorData['message']}';
+          } else {
+            errorMessage += ' - Response: ${r.body}';
+          }
+        } catch (e) {
+          errorMessage += ' - Response: ${r.body}';
+          print('⚠️ No se pudo decodificar error del servidor: $e');
+        }
+
+        throw Exception(errorMessage);
+      }
+
+      return jsonDecode(r.body);
+    } catch (e) {
+      print('❌ Error en crearMateriaPrima: $e');
+      rethrow;
+    }
+  }
+
+  /// Obtener lista de materia prima
+  Future<List<dynamic>> getMateriaPrima() async {
+    final r = await http.get(
+      Uri.parse('$baseUrl/api/materia-prima'),
+      headers: _headers,
+    );
+
+    if (r.statusCode != 200) {
+      throw Exception('Error al obtener materia prima: ${r.statusCode}');
+    }
+
+    return jsonDecode(r.body);
+  }
 }

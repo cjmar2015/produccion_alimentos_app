@@ -28,6 +28,7 @@ class _ProveedorDropdownState extends State<ProveedorDropdown> {
   bool _isLoading = true;
   final TextEditingController _nuevoProveedorController =
       TextEditingController();
+  final TextEditingController _busquedaController = TextEditingController();
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _ProveedorDropdownState extends State<ProveedorDropdown> {
   @override
   void dispose() {
     _nuevoProveedorController.dispose();
+    _busquedaController.dispose();
     super.dispose();
   }
 
@@ -260,106 +262,171 @@ class _ProveedorDropdownState extends State<ProveedorDropdown> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DropdownButtonFormField<String>(
-          value:
-              (_isLoading || _proveedores.isEmpty) ? null : _valorSeleccionado,
-          isExpanded: true, // Esto es crucial para evitar overflow
-          decoration: InputDecoration(
-            labelText: widget.labelText,
-            prefixIcon: const Icon(Icons.business_outlined),
-            suffixIcon:
-                _isLoading
-                    ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: Padding(
-                        padding: EdgeInsets.all(14.0),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                    : null, // Removemos el botón de refresh temporalmente
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF667EEA), width: 2),
-            ),
-          ),
-          items: [
-            // Opción para agregar nuevo proveedor
-            DropdownMenuItem<String>(
-              value: '_NUEVO_',
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF667EEA).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      size: 16,
-                      color: Color(0xFF667EEA),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Agregar Nuevo Proveedor',
-                      style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF667EEA),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Proveedores existentes
-            ..._proveedores.map((proveedor) {
-              final nombreComercial =
-                  proveedor['nombre_comercial'] ?? 'Sin nombre';
-              return DropdownMenuItem<String>(
-                value: nombreComercial,
-                child: Row(
-                  children: [
-                    const Icon(Icons.business, size: 16, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        nombreComercial,
-                        style: GoogleFonts.montserrat(),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            final String query = textEditingValue.text.toLowerCase();
+
+            // Si está cargando o no hay proveedores, devolver lista vacía
+            if (_isLoading || _proveedores.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+
+            // Siempre incluir la opción de agregar nuevo proveedor
+            List<String> opciones = ['Agregar Nuevo Proveedor'];
+
+            // Filtrar proveedores según el texto ingresado
+            if (query.isEmpty) {
+              // Si no hay texto, mostrar todos los proveedores
+              opciones.addAll(
+                _proveedores.map<String>(
+                  (proveedor) => proveedor['nombre_comercial'] ?? 'Sin nombre',
                 ),
               );
-            }),
-          ],
-          onChanged: (valor) {
-            if (valor == '_NUEVO_') {
+            } else {
+              // Filtrar proveedores que contengan el texto
+              opciones.addAll(
+                _proveedores
+                    .where(
+                      (proveedor) => (proveedor['nombre_comercial'] ?? '')
+                          .toLowerCase()
+                          .contains(query),
+                    )
+                    .map<String>(
+                      (proveedor) =>
+                          proveedor['nombre_comercial'] ?? 'Sin nombre',
+                    ),
+              );
+            }
+
+            return opciones;
+          },
+          onSelected: (String selection) {
+            if (selection == 'Agregar Nuevo Proveedor') {
               _mostrarDialogoNuevoProveedor();
-            } else if (valor != '_SEPARATOR_') {
+            } else {
               setState(() {
-                _valorSeleccionado = valor;
+                _valorSeleccionado = selection;
               });
-              widget.onChanged(valor);
+              widget.onChanged(selection);
             }
           },
-          validator:
-              widget.requerido
-                  ? (valor) {
-                    if (valor == null ||
-                        valor.isEmpty ||
-                        valor == '_NUEVO_' ||
-                        valor == '_SEPARATOR_') {
-                      return 'Por favor seleccione un proveedor';
-                    }
-                    return null;
-                  }
-                  : null,
+          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+            // Sincronizar el controller interno con nuestro valor seleccionado
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_valorSeleccionado != null &&
+                  controller.text != _valorSeleccionado) {
+                controller.text = _valorSeleccionado!;
+              }
+            });
+
+            return TextFormField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                labelText: widget.labelText,
+                prefixIcon: const Icon(Icons.business_outlined),
+                suffixIcon:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Padding(
+                            padding: EdgeInsets.all(14.0),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                        : IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            controller.clear();
+                            setState(() {
+                              _valorSeleccionado = null;
+                            });
+                            widget.onChanged(null);
+                          },
+                        ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF667EEA),
+                    width: 2,
+                  ),
+                ),
+              ),
+              validator:
+                  widget.requerido
+                      ? (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Este campo es requerido';
+                        }
+                        return null;
+                      }
+                      : null,
+            );
+          },
+          optionsViewBuilder: (context, onSelected, options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(12),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 200,
+                    maxWidth: 300,
+                  ),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: options.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      final String option = options.elementAt(index);
+                      final bool isNewOption =
+                          option == 'Agregar Nuevo Proveedor';
+
+                      return ListTile(
+                        leading:
+                            isNewOption
+                                ? Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF667EEA,
+                                    ).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Icon(
+                                    Icons.add,
+                                    size: 16,
+                                    color: Color(0xFF667EEA),
+                                  ),
+                                )
+                                : const Icon(
+                                  Icons.business,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                        title: Text(
+                          option,
+                          style: GoogleFonts.montserrat(
+                            fontWeight:
+                                isNewOption
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                            color: isNewOption ? const Color(0xFF667EEA) : null,
+                          ),
+                        ),
+                        onTap: () => onSelected(option),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         // Botón de refresh separado
         if (!_isLoading) ...[
