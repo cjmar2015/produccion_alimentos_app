@@ -26,39 +26,22 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   final List<String> _responsables = ['ROCIO', 'LORENA'];
   final List<String> _productos = [
     'LECHE',
-    'FRUTA',
     'AZUCAR',
     'HUEVOS',
-    'CREMA DE LECHE',
-    'CANELA',
-    'ACIDO CITRICO',
-    'BICARBONATO',
-    'AGUARDIENTE',
-    'BENZOATO',
-    'CEBOLLA',
-    'GINEBRA',
-    'SORBATO',
-    'ONIX',
-    'COLORANTE',
+    'LICORES',
+    'OTROS',
   ];
+
+  final _licorController = TextEditingController();
+  final _otroProductoController = TextEditingController();
 
   // Unidades según el producto
   final Map<String, List<String>> _productoUnidades = {
     'LECHE': ['LITROS', 'BOTELLAS'],
-    'FRUTA': ['KILOS', 'GRAMOS', 'UNIDADES', 'LIBRAS'],
-    'AZUCAR': ['KILOS', 'GRAMOS', 'LIBRAS'],
-    'HUEVOS': ['UNIDADES', 'DOCENAS', 'BANDEJAS'],
-    'CREMA DE LECHE': ['LITROS', 'MILILITROS'],
-    'CANELA': ['GRAMOS', 'KILOS', 'UNIDADES'],
-    'ACIDO CITRICO': ['GRAMOS', 'KILOS'],
-    'BICARBONATO': ['GRAMOS', 'KILOS'],
-    'AGUARDIENTE': ['LITROS', 'MILILITROS', 'BOTELLAS'],
-    'BENZOATO': ['GRAMOS', 'KILOS'],
-    'CEBOLLA': ['KILOS', 'GRAMOS', 'UNIDADES'],
-    'GINEBRA': ['LITROS', 'MILILITROS', 'BOTELLAS'],
-    'SORBATO': ['GRAMOS', 'KILOS'],
-    'ONIX': ['GRAMOS', 'KILOS', 'UNIDADES'],
-    'COLORANTE': ['GRAMOS', 'KILOS', 'MILILITROS'],
+    'AZUCAR': ['KILOS', 'LIBRAS', 'BULTOS'],
+    'HUEVOS': ['UNIDADES', 'BANDEJAS'],
+    'LICORES': ['LITROS', 'MILILITROS', 'BOTELLAS'],
+    'OTROS': ['KILOS', 'GRAMOS', 'LITROS', 'UNIDADES'],
   };
 
   List<String> get _unidadesDisponibles {
@@ -70,30 +53,14 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
   // Mapeo de productos a sus materias primas específicas
   final Map<String, List<String>> _productoMateriasPrimas = {
     'LECHE': ['Leche'],
-    'FRUTA': ['Fruta'],
     'AZUCAR': ['Azúcar'],
     'HUEVOS': ['Huevos / yemas'],
-    'CREMA DE LECHE': ['Crema de leche'],
-    'CANELA': ['Canela'],
-    'ACIDO CITRICO': ['Ácido cítrico'],
-    'BICARBONATO': ['Bicarbonato'],
-    'AGUARDIENTE': ['Aguardiente'],
-    'BENZOATO': ['Benzoato'],
-    'CEBOLLA': ['Cebolla'],
-    'GINEBRA': ['Ginebra'],
-    'SORBATO': ['Sorbato'],
-    'ONIX': ['Onix'],
-    'COLORANTE': ['Colorante'],
+    'LICORES': ['Licor'],
+    'OTROS': ['Otro producto'],
   };
 
   final Map<String, Map<String, dynamic>> _todasMateriasPrimas = {
     'Leche': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Fruta': {
       'proveedor': TextEditingController(),
       'cantidad': TextEditingController(),
       'condicionEmpaque': null,
@@ -111,67 +78,13 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
       'condicionEmpaque': null,
       'aprobada': null,
     },
-    'Crema de leche': {
+    'Licor': {
       'proveedor': TextEditingController(),
       'cantidad': TextEditingController(),
       'condicionEmpaque': null,
       'aprobada': null,
     },
-    'Canela': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Ácido cítrico': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Bicarbonato': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Aguardiente': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Benzoato': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Cebolla': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Ginebra': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Sorbato': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Onix': {
-      'proveedor': TextEditingController(),
-      'cantidad': TextEditingController(),
-      'condicionEmpaque': null,
-      'aprobada': null,
-    },
-    'Colorante': {
+    'Otro producto': {
       'proveedor': TextEditingController(),
       'cantidad': TextEditingController(),
       'condicionEmpaque': null,
@@ -199,13 +112,6 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
       'Temp. a recepción adecuada': {'cumple': null, 'observaciones': ''},
       'Empaque íntegro, limpio': {'cumple': null, 'observaciones': ''},
     },
-    'Fruta': {
-      'Color característico': {'cumple': null, 'observaciones': ''},
-      'Sin golpes o machucones': {'cumple': null, 'observaciones': ''},
-      'Ausencia de moho o fermentación': {'cumple': null, 'observaciones': ''},
-      'Grado de madurez adecuado': {'cumple': null, 'observaciones': ''},
-      'Limpia y sin insectos': {'cumple': null, 'observaciones': ''},
-    },
     'Huevos / yemas': {
       'Sin olor desagradable': {'cumple': null, 'observaciones': ''},
       'Cáscara limpia (si aplica)': {'cumple': null, 'observaciones': ''},
@@ -218,72 +124,17 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
       'Sin humedad o apelmazamiento': {'cumple': null, 'observaciones': ''},
       'Empaque íntegro': {'cumple': null, 'observaciones': ''},
     },
-    'Crema de leche': {
-      'Olor fresco característico': {'cumple': null, 'observaciones': ''},
-      'Color uniforme': {'cumple': null, 'observaciones': ''},
-      'Textura cremosa sin separación': {'cumple': null, 'observaciones': ''},
-      'Temperatura adecuada': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-    },
-    'Canela': {
-      'Color característico': {'cumple': null, 'observaciones': ''},
-      'Aroma fuerte y agradable': {'cumple': null, 'observaciones': ''},
-      'Sin presencia de humedad': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-    },
-    'Ácido cítrico': {
-      'Cristales blancos': {'cumple': null, 'observaciones': ''},
-      'Sin impurezas': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-      'Registro sanitario vigente': {'cumple': null, 'observaciones': ''},
-    },
-    'Bicarbonato': {
-      'Polvo blanco fino': {'cumple': null, 'observaciones': ''},
-      'Sin grumos': {'cumple': null, 'observaciones': ''},
-      'Empaque íntegro': {'cumple': null, 'observaciones': ''},
-      'Fecha de vencimiento vigente': {'cumple': null, 'observaciones': ''},
-    },
-    'Aguardiente': {
+    'Licor': {
       'Sello de seguridad intacto': {'cumple': null, 'observaciones': ''},
       'Transparencia sin partículas': {'cumple': null, 'observaciones': ''},
       'Graduación alcohólica declarada': {'cumple': null, 'observaciones': ''},
       'Proveedor autorizado': {'cumple': null, 'observaciones': ''},
     },
-    'Benzoato': {
-      'Polvo cristalino blanco': {'cumple': null, 'observaciones': ''},
-      'Sin contaminación': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-      'Ficha técnica disponible': {'cumple': null, 'observaciones': ''},
-    },
-    'Cebolla': {
-      'Firmeza adecuada': {'cumple': null, 'observaciones': ''},
-      'Sin brotes excesivos': {'cumple': null, 'observaciones': ''},
-      'Ausencia de podredumbre': {'cumple': null, 'observaciones': ''},
-      'Limpia y sin tierra': {'cumple': null, 'observaciones': ''},
-    },
-    'Ginebra': {
-      'Sello intacto': {'cumple': null, 'observaciones': ''},
-      'Transparencia característica': {'cumple': null, 'observaciones': ''},
-      'Graduación correcta': {'cumple': null, 'observaciones': ''},
-      'Proveedor autorizado': {'cumple': null, 'observaciones': ''},
-    },
-    'Sorbato': {
-      'Polvo cristalino': {'cumple': null, 'observaciones': ''},
-      'Color característico': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-      'Certificado de análisis': {'cumple': null, 'observaciones': ''},
-    },
-    'Onix': {
-      'Apariencia característica': {'cumple': null, 'observaciones': ''},
-      'Sin contaminantes': {'cumple': null, 'observaciones': ''},
+    'Otro producto': {
+      'Apariencia general adecuada': {'cumple': null, 'observaciones': ''},
+      'Sin contaminación visible': {'cumple': null, 'observaciones': ''},
       'Empaque íntegro': {'cumple': null, 'observaciones': ''},
       'Documentación completa': {'cumple': null, 'observaciones': ''},
-    },
-    'Colorante': {
-      'Color uniforme': {'cumple': null, 'observaciones': ''},
-      'Solubilidad adecuada': {'cumple': null, 'observaciones': ''},
-      'Empaque sellado': {'cumple': null, 'observaciones': ''},
-      'Registro sanitario vigente': {'cumple': null, 'observaciones': ''},
     },
   };
 
@@ -327,6 +178,8 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     _horaController.dispose();
     _cantidadController.dispose();
     _valorCompraController.dispose();
+    _licorController.dispose();
+    _otroProductoController.dispose();
     for (var mp in _todasMateriasPrimas.values) {
       mp['proveedor'].dispose();
       mp['cantidad'].dispose();
@@ -514,6 +367,96 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           ),
         ),
         const SizedBox(height: 24),
+        _buildDropdownField(
+          label: 'Producto',
+          value: _productoSeleccionado,
+          items: _productos,
+          required: true,
+          icon: Icons.inventory_2_outlined,
+          onChanged: (value) {
+            setState(() {
+              _productoSeleccionado = value;
+              _unidadSeleccionada = null;
+              _cantidadController.clear();
+              _licorController.clear();
+              _otroProductoController.clear();
+            });
+          },
+        ),
+        if (_productoSeleccionado == 'LICORES') ...[
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _licorController,
+            decoration: InputDecoration(
+              labelText: '¿Qué licor? *',
+              hintText: 'Ej: Aguardiente, Ron, Ginebra, etc.',
+              prefixIcon: const Icon(Icons.liquor_outlined),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Debe especificar el tipo de licor';
+              }
+              return null;
+            },
+          ),
+        ],
+        if (_productoSeleccionado == 'OTROS') ...[
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _otroProductoController,
+            decoration: InputDecoration(
+              labelText: '¿Qué producto? *',
+              hintText: 'Especifique el producto',
+              prefixIcon: const Icon(Icons.edit_outlined),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Debe especificar el producto';
+              }
+              return null;
+            },
+          ),
+        ],
+        if (_productoSeleccionado != null) ...[
+          const SizedBox(height: 16),
+          _buildNumberField(
+            controller: _cantidadController,
+            label: 'Cantidad',
+            required: true,
+            icon: Icons.scale_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdownField(
+            label: 'Unidad',
+            value: _unidadSeleccionada,
+            items: _unidadesDisponibles,
+            required: true,
+            icon: Icons.straighten_outlined,
+            onChanged: (value) {
+              setState(() {
+                _unidadSeleccionada = value;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildNumberField(
+            controller: _valorCompraController,
+            label: 'Valor de Compra \$COP',
+            required: true,
+            icon: Icons.attach_money_outlined,
+          ),
+        ],
+        const SizedBox(height: 16),
         _buildDateField(
           label: 'Fecha de Inspección',
           value: _fechaInspeccion,
@@ -551,50 +494,6 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
             });
           },
         ),
-        const SizedBox(height: 16),
-        _buildDropdownField(
-          label: 'Producto',
-          value: _productoSeleccionado,
-          items: _productos,
-          required: true,
-          icon: Icons.inventory_2_outlined,
-          onChanged: (value) {
-            setState(() {
-              _productoSeleccionado = value;
-              _unidadSeleccionada = null;
-              _cantidadController.clear();
-            });
-          },
-        ),
-        if (_productoSeleccionado != null) ...[
-          const SizedBox(height: 16),
-          _buildNumberField(
-            controller: _cantidadController,
-            label: 'Cantidad',
-            required: true,
-            icon: Icons.scale_outlined,
-          ),
-          const SizedBox(height: 16),
-          _buildDropdownField(
-            label: 'Unidad',
-            value: _unidadSeleccionada,
-            items: _unidadesDisponibles,
-            required: true,
-            icon: Icons.straighten_outlined,
-            onChanged: (value) {
-              setState(() {
-                _unidadSeleccionada = value;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildNumberField(
-            controller: _valorCompraController,
-            label: 'Valor de Compra \$COP',
-            required: true,
-            icon: Icons.attach_money_outlined,
-          ),
-        ],
       ],
     );
   }
@@ -617,7 +516,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
             padding: const EdgeInsets.only(bottom: 16),
             child: _buildMateriaPrimaCard(mp),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -671,11 +570,11 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
                     },
                   ),
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 16),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -710,7 +609,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
               },
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -735,7 +634,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
             padding: const EdgeInsets.only(bottom: 16),
             child: _buildNoConformidadCard(nc, index),
           );
-        }).toList(),
+        }),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: _agregarNoConformidad,
@@ -932,7 +831,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     IconData? icon,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: label + (required ? ' *' : ''),
         prefixIcon: icon != null ? Icon(icon) : null,
@@ -1405,6 +1304,16 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
         }
         if (_productoSeleccionado == null || _productoSeleccionado!.isEmpty) {
           _showError('Debe seleccionar un producto');
+          return false;
+        }
+        if (_productoSeleccionado == 'LICORES' &&
+            _licorController.text.isEmpty) {
+          _showError('Debe especificar qué tipo de licor');
+          return false;
+        }
+        if (_productoSeleccionado == 'OTROS' &&
+            _otroProductoController.text.isEmpty) {
+          _showError('Debe especificar qué producto es');
           return false;
         }
         if (_cantidadController.text.isEmpty) {
