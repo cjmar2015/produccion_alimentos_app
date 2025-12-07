@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/api_service.dart';
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class ControlMateriasScreen extends StatefulWidget {
   final ApiService api;
@@ -40,7 +54,7 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     'LECHE': ['LITROS', 'BOTELLAS'],
     'AZUCAR': ['KILOS', 'LIBRAS', 'BULTOS'],
     'HUEVOS': ['UNIDADES', 'BANDEJAS'],
-    'LICORES': ['LITROS', 'MILILITROS', 'BOTELLAS'],
+    'LICORES': ['LITROS', 'BOTELLAS', 'GARRAFAS'],
     'OTROS': ['KILOS', 'GRAMOS', 'LITROS', 'UNIDADES'],
   };
 
@@ -387,9 +401,10 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _licorController,
+            inputFormatters: [UpperCaseTextFormatter()],
             decoration: InputDecoration(
               labelText: '¿Qué licor? *',
-              hintText: 'Ej: Aguardiente, Ron, Ginebra, etc.',
+              hintText: 'Ej: AGUARDIENTE, RON, GINEBRA',
               prefixIcon: const Icon(Icons.liquor_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -409,9 +424,10 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _otroProductoController,
+            inputFormatters: [UpperCaseTextFormatter()],
             decoration: InputDecoration(
               labelText: '¿Qué producto? *',
-              hintText: 'Especifique el producto',
+              hintText: 'ESPECIFIQUE EL PRODUCTO',
               prefixIcon: const Icon(Icons.edit_outlined),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -735,6 +751,9 @@ class _ControlMateriasScreenState extends State<ControlMateriasScreen> {
     return TextFormField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+      ],
       decoration: InputDecoration(
         labelText: label + (required ? ' *' : ''),
         prefixIcon: icon != null ? Icon(icon) : null,
